@@ -18,6 +18,10 @@
 package org.pentaho.platform.web.http.api.resources;
 
 import org.codehaus.enunciate.Facet;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.pentaho.platform.api.engine.IPentahoSession;
 import org.pentaho.platform.api.usersettings.IUserSettingService;
 import org.pentaho.platform.api.usersettings.pojo.IUserSetting;
@@ -108,9 +112,70 @@ public class UserSettingsResource extends AbstractJaxRSResource {
     IUserSettingService settingsService = PentahoSystem.get( IUserSettingService.class, getPentahoSession() );
 
     //preventing stored XSS(PPP-3464)
-    settingValue = settingValue.replaceAll( "&", "&amp;" ).replaceAll( "\"", "&quot;" ).replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
+
+    settingValue = encodeJsonStringValues( settingValue );
     settingsService.setUserSetting( setting, settingValue );
     return Response.ok( settingValue ).build();
   }
+  
+  String encodeJsonStringValues(String jsonSrc) {
+    if ( jsonSrc == null ) {
+      return null;
+    }
+    Object jsonObj;
+    try {
+      jsonObj = (new JSONParser()).parse( jsonSrc );
+    } catch ( ParseException e ) {
+      //TODO: log-debug
+      return encodeString(jsonSrc);
+    }
+    Object encodedJsonObj = encodeJsonStringValues( jsonObj );
+    return String.valueOf( encodedJsonObj );
+  }
+  
+  <T> T encodeJsonStringValues(T jsonObj) {
+    if ( jsonObj instanceof String ) {
+      return (T)encodeString( (String) jsonObj);
+    }
+    if ( jsonObj instanceof JSONArray ) {
+      return (T)encodeArray( (JSONArray) jsonObj);
+    }
+    if ( jsonObj instanceof JSONObject ) {
+      return (T)encodeObject( (JSONObject) jsonObj);
+    }
+    return jsonObj;
+  }
+
+  String encodeString(String text) {
+    if ( text == null ) {
+      return null;
+    }
+    return org.apache.commons.lang.StringEscapeUtils.escapeHtml( text );
+    //return text.replaceAll( "&", "&amp;" ).replaceAll( "\"", "&quot;" ).replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
+  }
+  JSONArray encodeArray(JSONArray array) {
+    if ( array == null ) {
+      return null;
+    }
+    JSONArray r = new JSONArray();
+    for (Object value : array) {
+      final Object encodedValue = encodeJsonStringValues(value);
+      r.add( encodedValue );
+    }
+    return r;
+  }
+  JSONObject encodeObject(JSONObject object) {
+    if ( object == null ) {
+      return null;
+    }
+    JSONObject r = new JSONObject();
+    for (Object key : object.keySet() ){
+      Object value = object.get( key );
+      final Object encodedValue = encodeJsonStringValues(value);
+      r.put( key, encodedValue );
+    }
+    return object;
+  }
+  
 
 }
