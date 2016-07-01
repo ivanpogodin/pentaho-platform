@@ -180,8 +180,12 @@ public class EscapeUtils {
     return result;
   }
 
-  public String escapeJsonValues( String text ) {
+  public String escapeJsonValuesImpl( String text ) {
     return escapeJsonValues3( text );
+  }
+  
+  public static String escapeJsonValues( String text ) {
+    return (new EscapeUtils()).escapeJsonValuesImpl( text );
   }
 
 }

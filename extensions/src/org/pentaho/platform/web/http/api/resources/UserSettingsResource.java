@@ -28,6 +28,7 @@ import org.pentaho.platform.api.usersettings.IUserSettingService;
 import org.pentaho.platform.api.usersettings.pojo.IUserSetting;
 import org.pentaho.platform.engine.core.system.PentahoSessionHolder;
 import org.pentaho.platform.engine.core.system.PentahoSystem;
+import org.pentaho.platform.web.http.api.resources.utils.EscapeUtils;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -115,100 +116,10 @@ public class UserSettingsResource extends AbstractJaxRSResource {
 
     //preventing stored XSS(PPP-3464)
 
-    settingValue = encodeJsonStringValues( settingValue );
+    settingValue = EscapeUtils.escapeJsonValues( settingValue );
+    //settingValue = encodeJsonStringValues( settingValue );
     settingsService.setUserSetting( setting, settingValue );
     return Response.ok( settingValue ).build();
   }
   
-  String encodeJsonStringValues(String jsonSrc) {
-    if ( jsonSrc == null ) {
-      return null;
-    }
-    Object jsonObj;
-    try {
-      
-      
-      jsonObj = (new JSONParser()).parse( jsonSrc );
-      
-      ObjectMapper om = new ObjectMapper
-    } catch ( ParseException e ) {
-      //TODO: log-debug
-      e.printStackTrace();
-      return encodeString(jsonSrc);
-    }
-    Object encodedJsonObj = encodeJsonStringValues( jsonObj );
-    final String result = String.valueOf( encodedJsonObj );
-    System.out.println("result=" + result);
-    return result;
-  }
-  
-  <T> T encodeJsonStringValues(T jsonObj) {
-    if ( jsonObj instanceof String ) {
-      return (T)encodeString( (String) jsonObj);
-    }
-    if ( jsonObj instanceof JSONArray ) {
-      return (T)encodeArray( (JSONArray) jsonObj);
-    }
-    if ( jsonObj instanceof JSONObject ) {
-      return (T)encodeObject( (JSONObject) jsonObj);
-    }
-    return jsonObj;
-  }
-
-  String encodeString(String text) {
-    if ( text == null ) {
-      return null;
-    }
-    return org.apache.commons.lang.StringEscapeUtils.escapeHtml( text );
-    //return text.replaceAll( "&", "&amp;" ).replaceAll( "\"", "&quot;" ).replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
-  }
-  JSONArray encodeArray(JSONArray array) {
-    if ( array == null ) {
-      return null;
-    }
-    JSONArray r = new JSONArray();
-    for (Object value : array) {
-      final Object encodedValue = encodeJsonStringValues(value);
-      r.add( encodedValue );
-    }
-    return r;
-  }
-  JSONObject encodeObject(JSONObject object) {
-    if ( object == null ) {
-      return null;
-    }
-    JSONObject r = new JSONObject();
-    for (Object key : object.keySet() ){
-      Object value = object.get( key );
-      final Object encodedValue = encodeJsonStringValues(value);
-      r.put( key, encodedValue );
-    }
-    return object;
-  }
-  
-
-  class HTMLCharacterEscapes extends CharacterEscapes
-  {
-      private final int[] asciiEscapes;
-      
-      public HTMLCharacterEscapes()
-      {
-          // start with set of characters known to require escaping (double-quote, backslash etc)
-          int[] esc = CharacterEscapes.standardAsciiEscapesForJSON();
-          // and force escaping of a few others:
-          esc['<'] = CharacterEscapes.ESCAPE_STANDARD;
-          esc['>'] = CharacterEscapes.ESCAPE_STANDARD;
-          esc['&'] = CharacterEscapes.ESCAPE_STANDARD;
-          esc['\''] = CharacterEscapes.ESCAPE_STANDARD;
-          asciiEscapes = esc;
-      }
-      // this method gets called for character codes 0 - 127
-      @Override public int[] getEscapeCodesForAscii() {
-          return asciiEscapes;
-      }
-      // and this for others; we don't need anything special here
-      @Override public SerializableString getEscapeSequence(int ch) {
-          // no further escaping (beyond ASCII chars) needed:
-          return null;
-      }
-  }}
+}

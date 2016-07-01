@@ -246,7 +246,6 @@ public abstract class AbstractFilePickList<T extends IFilePickItem> {
           if ( response.getStatusCode() == Response.SC_OK ) {
             try {
               String text = response.getText();
-              // com.smartgwt.client.util.StringUtil.unescapeHTML( text );
               JSONArray jsonArr = ( JSONArray ) JSONParser.parse( text );
               filePickList = new ArrayList<T>();
               T filePickItem;
