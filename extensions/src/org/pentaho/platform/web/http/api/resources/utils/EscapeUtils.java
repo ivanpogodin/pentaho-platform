@@ -180,6 +180,34 @@ public class EscapeUtils {
     return result;
   }
 
+  public String escapeJsonValues4( String text ) {
+    if (text == null) {
+      return null;
+    }
+    ObjectMapper om = new ObjectMapper();
+    final ObjectMapper escapingMapper = getEscapingMapper();
+    String result = null;
+    try { // escape only JSON values and keys
+      JsonNode node = om.readTree( text );
+      
+      result = escapingMapper.writeValueAsString(node);
+    } catch ( Exception e ) {
+      //TODO log debug
+      e.printStackTrace();
+    }
+    if (result == null) {
+      // Failed escaping as JSON
+      // Escape raw text
+      try { // escape only JSON values and keys
+        result = escapingMapper.writeValueAsString(text);
+      } catch ( Exception e ) {
+        //TODO log debug
+        e.printStackTrace();
+      }
+    }
+    return result;
+  }
+
   public String escapeJsonValuesImpl( String text ) {
     return escapeJsonValues3( text );
   }

@@ -27,105 +27,98 @@ public class EscapeUtilsTest {
   }  
   @Test
   public void test1( ) {
-    {
-      System.out.println((new Throwable()).getStackTrace()[0].getMethodName());
-      final String src = "[\"as<>df\",\"<xxx>\"]";
-      String actual = eu.escapeJsonValues( src);
-      final String expect = "[\"as\\u003C\\u003Edf\",\"\\u003Cxxx\\u003E\"]";
-      
-      for (char c : src.toCharArray()) System.out.print( c ); System.out.println();
-      for (char c : actual.toCharArray()) System.out.print( c ); System.out.println();
-      for (char c : expect.toCharArray()) System.out.print( c ); System.out.println();
-      
-      Assert.assertEquals( expect, actual );
-      
-      System.out.println("   src.json: " + JSON.toString( JSON.parse( src )));
-      System.out.println("actual.json: " + JSON.toString( JSON.parse( actual )));
-      System.out.println("expect.json: " + JSON.toString( JSON.parse( expect )));
-      Assert.assertEquals( "JSON", JSON.toString( JSON.parse( src )), JSON.toString( JSON.parse( actual )) );
-    }
+    System.out.println();
+    System.out.println((new Throwable()).getStackTrace()[0].getMethodName());
+    final String src = "[\"as<>df\",\"<xxx>\"]";
+    final String expect = "[\"as\\u003C\\u003Edf\",\"\\u003Cxxx\\u003E\"]";
+    Assert.assertEquals( "JSON", JSON.toString( JSON.parse( src )), JSON.toString( JSON.parse( expect )) );
+
+    String actual = eu.escapeJsonValues( src);
+    
+    System.out.println("        src: " + src);
+    System.out.println("     expect: " + actual);
+    System.out.println("     actual: " + expect);
+    System.out.println("   src.json: " + JSON.toString( JSON.parse( src )));
+    System.out.println("expect.json: " + JSON.toString( JSON.parse( expect )));
+    System.out.println("actual.json: " + JSON.toString( JSON.parse( actual )));
+
+    Assert.assertEquals( expect, actual );
   }  
   @Test
   public void test2( ) {
-    {
-      System.out.println((new Throwable()).getStackTrace()[0].getMethodName());
-      final String src = "[\"asdf\",123]";
-      String actual = eu.escapeJsonValues( src);
-      final String expect = "[\"asdf\",123]";
-      
-      for (char c : src.toCharArray()) System.out.print( c ); System.out.println();
-      for (char c : actual.toCharArray()) System.out.print( c ); System.out.println();
-      for (char c : expect.toCharArray()) System.out.print( c ); System.out.println();
-      
-      Assert.assertEquals( expect, actual );
-      
-      System.out.println("   src.json: " + JSON.toString( JSON.parse( src )));
-      System.out.println("actual.json: " + JSON.toString( JSON.parse( actual )));
-      System.out.println("expect.json: " + JSON.toString( JSON.parse( expect )));
-      Assert.assertEquals( "JSON", JSON.toString( JSON.parse( src )), JSON.toString( JSON.parse( actual )) );
-    }
+    System.out.println();
+    System.out.println((new Throwable()).getStackTrace()[0].getMethodName());
+    final String src = "[\"asdf\",123]";
+    final String expect = "[\"asdf\",123]";
+    Assert.assertEquals( "JSON", JSON.toString( JSON.parse( src )), JSON.toString( JSON.parse( expect )) );
+
+    String actual = eu.escapeJsonValues( src);
+    
+    System.out.println("        src: " + src);
+    System.out.println("     expect: " + actual);
+    System.out.println("     actual: " + expect);
+    System.out.println("   src.json: " + JSON.toString( JSON.parse( src )));
+    System.out.println("expect.json: " + JSON.toString( JSON.parse( expect )));
+    System.out.println("actual.json: " + JSON.toString( JSON.parse( actual )));
+
+    Assert.assertEquals( expect, actual );
   }  
   @Test
   public void test3( ) {
-    {
-      System.out.println((new Throwable()).getStackTrace()[0].getMethodName());
-      final String src = "{\"as&df\":\"<xxx>\", \"AS\" : \"zz\", \"X\":null}";
-      String actual = eu.escapeJsonValues( src);
-      final String expect = "{\"as\\u0026df\":\"\\u003Cxxx\\u003E\",\"AS\":\"zz\",\"X\":null}";
-      
-      for (char c : src.toCharArray()) System.out.print( c ); System.out.println();
-      for (char c : actual.toCharArray()) System.out.print( c ); System.out.println();
-      for (char c : expect.toCharArray()) System.out.print( c ); System.out.println();
-      
-      Assert.assertEquals( expect, actual );
-      
-      System.out.println("   src.json: " + JSON.toString( JSON.parse( src )));
-      System.out.println("actual.json: " + JSON.toString( JSON.parse( actual )));
-      System.out.println("expect.json: " + JSON.toString( JSON.parse( expect )));
-      Assert.assertEquals( "JSON", JSON.toString( JSON.parse( src )), JSON.toString( JSON.parse( actual )) );
-    }
+    System.out.println();
+    System.out.println((new Throwable()).getStackTrace()[0].getMethodName());
+    final String src = "{\"as&df\":\"<xxx>\", \"AS\" : \"zz\", \"X\":null}";
+    final String expect = "{\"as\\u0026df\":\"\\u003Cxxx\\u003E\",\"AS\":\"zz\",\"X\":null}";
+    Assert.assertEquals( "JSON", JSON.toString( JSON.parse( src )), JSON.toString( JSON.parse( expect )) );
 
+    String actual = eu.escapeJsonValues( src);
+    
+    System.out.println("        src: " + src);
+    System.out.println("     expect: " + actual);
+    System.out.println("     actual: " + expect);
+    System.out.println("   src.json: " + JSON.toString( JSON.parse( src )));
+    System.out.println("expect.json: " + JSON.toString( JSON.parse( expect )));
+    System.out.println("actual.json: " + JSON.toString( JSON.parse( actual )));
+
+    Assert.assertEquals( expect, actual );
   }
   @Test
   public void test4( ) {
-    {
-      System.out.println((new Throwable()).getStackTrace()[0].getMethodName());
-      final String src = "{\"as&df\":\"<xxx>\", \"A\\\"S\" : \"z\\\"z\", \"X\":[123,\"\",\">\\\\<\"]}";
-      String actual = eu.escapeJsonValues( src);
-      final String expect = "{\"as\\u0026df\":\"\\u003Cxxx\\u003E\",\"A\\\"S\":\"z\\\"z\",\"X\":[123,\"\",\"\\u003E\\\\\\u003C\"]}";
-      
-      for (char c : src.toCharArray()) System.out.print( c ); System.out.println();
-      for (char c : actual.toCharArray()) System.out.print( c ); System.out.println();
-      for (char c : expect.toCharArray()) System.out.print( c ); System.out.println();
-      
-      Assert.assertEquals( expect, actual );
-      
-      System.out.println("   src.json: " + JSON.toString( JSON.parse( src )));
-      System.out.println("actual.json: " + JSON.toString( JSON.parse( actual )));
-      System.out.println("expect.json: " + JSON.toString( JSON.parse( expect )));
-      Assert.assertEquals( "JSON", JSON.toString( JSON.parse( src )), JSON.toString( JSON.parse( actual )) );
-    }
+    System.out.println();
+    System.out.println((new Throwable()).getStackTrace()[0].getMethodName());
+    final String src = "{\"as&df\":\"<xxx>\", \"A\\\"S\" : \"z\\\"z\", \"X\":[123,\"\",\">\\\\<\"]}";
+    final String expect = "{\"as\\u0026df\":\"\\u003Cxxx\\u003E\",\"A\\\"S\":\"z\\\"z\",\"X\":[123,\"\",\"\\u003E\\\\\\u003C\"]}";
+    Assert.assertEquals( "JSON", JSON.toString( JSON.parse( src )), JSON.toString( JSON.parse( expect )) );
 
+    String actual = eu.escapeJsonValues( src);
+    
+    System.out.println("        src: " + src);
+    System.out.println("     expect: " + actual);
+    System.out.println("     actual: " + expect);
+    System.out.println("   src.json: " + JSON.toString( JSON.parse( src )));
+    System.out.println("expect.json: " + JSON.toString( JSON.parse( expect )));
+    System.out.println("actual.json: " + JSON.toString( JSON.parse( actual )));
+
+    Assert.assertEquals( expect, actual );
   }
   @Test
   public void test10(  ) {
-    {
-      System.out.println((new Throwable()).getStackTrace()[0].getMethodName());
-      final String src = "1";
-      String actual = eu.escapeJsonValues( src);
-      final String expect = "1";
-      
-      for (char c : src.toCharArray()) System.out.print( c ); System.out.println();
-      for (char c : actual.toCharArray()) System.out.print( c ); System.out.println();
-      for (char c : expect.toCharArray()) System.out.print( c ); System.out.println();
-      
-      Assert.assertEquals( expect, actual );
-      
-      System.out.println("   src.json: " + JSON.toString( JSON.parse( src )));
-      System.out.println("actual.json: " + JSON.toString( JSON.parse( actual )));
-      System.out.println("expect.json: " + JSON.toString( JSON.parse( expect )));
-      Assert.assertEquals( "JSON", JSON.toString( JSON.parse( src )), JSON.toString( JSON.parse( actual )) );
-    }
+    System.out.println();
+    System.out.println((new Throwable()).getStackTrace()[0].getMethodName());
+    final String src = "1";
+    final String expect = "1";
+    Assert.assertEquals( "JSON", JSON.toString( JSON.parse( src )), JSON.toString( JSON.parse( expect )) );
+
+    String actual = eu.escapeJsonValues( src);
+    
+    System.out.println("        src: " + src);
+    System.out.println("     expect: " + actual);
+    System.out.println("     actual: " + expect);
+    System.out.println("   src.json: " + JSON.toString( JSON.parse( src )));
+    System.out.println("expect.json: " + JSON.toString( JSON.parse( expect )));
+    System.out.println("actual.json: " + JSON.toString( JSON.parse( actual )));
+
+    Assert.assertEquals( expect, actual );
   }  
 
   //@Test
