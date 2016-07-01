@@ -116,10 +116,9 @@ public class UserSettingsResource extends AbstractJaxRSResource {
 
     //preventing stored XSS(PPP-3464)
 
-    settingValue = EscapeUtils.escapeJsonValues( settingValue );
-    //settingValue = encodeJsonStringValues( settingValue );
+    settingValue = EscapeUtils.escapeHtmlInJson( settingValue );
     settingsService.setUserSetting( setting, settingValue );
     return Response.ok( settingValue ).build();
   }
-  
+
 }

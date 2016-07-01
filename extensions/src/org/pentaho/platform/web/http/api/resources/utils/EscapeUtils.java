@@ -20,22 +20,50 @@ package org.pentaho.platform.web.http.api.resources.utils;
 
 import java.io.IOException;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.pentaho.platform.util.RepositoryPathEncoder;
-import org.pentaho.platform.web.http.messages.Messages;
-import org.codehaus.jackson.JsonGenerationException;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.SerializableString;
+import org.codehaus.jackson.Version;
 import org.codehaus.jackson.io.CharacterEscapes;
-import org.codehaus.jackson.io.SerializedString;
-import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializerProvider;
+import org.codehaus.jackson.map.module.SimpleModule;
+import org.eclipse.jetty.util.ajax.JSON;
 
 public class EscapeUtils {
+  
+  private static class HtmlEscapeStringSerializer extends JsonSerializer<String> {
+
+    @Override
+    public void serialize(String s, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+            throws IOException, JsonProcessingException {
+        String escaped = StringEscapeUtils.escapeHtml4(s);
+        jsonGenerator.writeString(escaped);
+    }
+  }
+
+  public static String escapeHtmlInJson( String text ) {
+    if (text == null) {
+      return null;
+    }
+    try { // escape only JSON values and keys
+      ObjectMapper mapper1 = new ObjectMapper();
+      SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1,0,0,null));
+      simpleModule.addSerializer(String.class, new HtmlEscapeStringSerializer());
+      mapper1.registerModule(simpleModule);
+      final Object parsedJson = JSON.parse( text );
+      String result = mapper1.writeValueAsString(parsedJson);
+      return result;
+    } catch ( Exception e ) { // escape raw text
+      //TODO log debug
+      e.printStackTrace();
+      String result = StringEscapeUtils.escapeHtml4(text);
+      return result;
+    }
+  }
   
   private static final int[] esc;
   static{
@@ -47,23 +75,7 @@ public class EscapeUtils {
       esc[(int)'\"'] = CharacterEscapes.ESCAPE_CUSTOM;
   }
   
-  private static final class HtmlEscapes extends CharacterEscapes {
-
-    @Override
-    public
-    int[] getEscapeCodesForAscii() {
-        return esc;
-    }
-
-    @Override
-    public
-    SerializableString getEscapeSequence(final int i) {
-      return new SerializedString(org.apache.commons.lang.StringEscapeUtils.escapeHtml(Character.toString((char) i)));
-    }
-    
-  }
-
-  public class HTMLCharacterEscapes extends CharacterEscapes
+  private static class HTMLCharacterEscapes extends CharacterEscapes
   {
       private final int[] asciiEscapes;
       
@@ -89,131 +101,35 @@ public class EscapeUtils {
       }
   }
 
-  // and then an example of how to apply it
-  public ObjectMapper getEscapingMapper() {
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.getJsonFactory().setCharacterEscapes(new HTMLCharacterEscapes());
-      return mapper;
-  }
-  public ObjectMapper getRawEscapingMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.getJsonFactory().setCharacterEscapes(new HTMLCharacterEscapes());
-    return mapper;
-}
-
-  public String escapeJsonValues1( String text ) {
+  public static String escapeJson( String text ) throws IOException {
     if (text == null) {
       return null;
     }
-    String result = null;
+    ObjectMapper escapingMapper = new ObjectMapper();
+    escapingMapper.getJsonFactory().setCharacterEscapes(new HTMLCharacterEscapes());
+
+    JsonNode parsedJson = (new ObjectMapper()).readTree( text );
+    String result = escapingMapper.writeValueAsString(parsedJson);
+    return result;
+  }
+
+  public static String escapeHtml( String text ) {
+    if (text == null) {
+      return null;
+    }
+    return StringEscapeUtils.escapeHtml4(text);
+  }
+
+  public static String escapeJsonOrHtml( String text ) {
+    if (text == null) {
+      return null;
+    }
     try {
-      ObjectMapper om = new ObjectMapper();
-      JsonNode node = om.readTree( text );
-
-      org.codehaus.jackson.map.ObjectMapper objectMapper = new org.codehaus.jackson.map.ObjectMapper();
-      objectMapper.getJsonFactory().setCharacterEscapes(new HtmlEscapes());
-      result = objectMapper.writeValueAsString(node);
-    } catch (Error e) {
-      e.printStackTrace();
-    } catch ( JsonGenerationException e ) {
-      e.printStackTrace();
-    } catch ( JsonMappingException e ) {
-      e.printStackTrace();
-    } catch ( IOException e ) {
-      e.printStackTrace();
-    }
-    if (result == null) {
-      result = org.apache.commons.lang.StringEscapeUtils.escapeHtml(text);
-    }
-    return result;
-    
-  }
-
-  public String escapeJsonValues2( String text ) {
-    if (text == null) {
-      return null;
-    }
-    String result = null;
-    final ObjectMapper escapingMapper = getEscapingMapper();
-    try { // escape only JSON values and keys
-      ObjectMapper om = new ObjectMapper();
-      JsonNode node = om.readTree( text );
-      
-      result = escapingMapper.writeValueAsString(node);
+      return escapeJson( text );
     } catch ( Exception e ) {
       //TODO log debug
-      e.printStackTrace();
+      return escapeHtml(text);
     }
-    if (result == null) {
-      // Failed escaping as JSON
-      // Escape raw text
-      result = org.apache.commons.lang.StringEscapeUtils.escapeHtml(text);
-    }
-    return result;
-    
-  }
-  public String escapeJsonValues3( String text ) {
-    if (text == null) {
-      return null;
-    }
-    ObjectMapper om = new ObjectMapper();
-    final ObjectMapper escapingMapper = getEscapingMapper();
-    String result = null;
-    try { // escape only JSON values and keys
-      JsonNode node = om.readTree( text );
-      
-      result = escapingMapper.writeValueAsString(node);
-    } catch ( Exception e ) {
-      //TODO log debug
-      e.printStackTrace();
-    }
-    if (result == null) {
-      // Failed escaping as JSON
-      // Escape raw text
-      try { // escape only JSON values and keys
-        result = escapingMapper.writeValueAsString(text);
-      } catch ( Exception e ) {
-        //TODO log debug
-        e.printStackTrace();
-      }
-    }
-    return result;
-  }
-
-  public String escapeJsonValues4( String text ) {
-    if (text == null) {
-      return null;
-    }
-    ObjectMapper om = new ObjectMapper();
-    final ObjectMapper escapingMapper = getEscapingMapper();
-    String result = null;
-    try { // escape only JSON values and keys
-      JsonNode node = om.readTree( text );
-      
-      result = escapingMapper.writeValueAsString(node);
-    } catch ( Exception e ) {
-      //TODO log debug
-      e.printStackTrace();
-    }
-    if (result == null) {
-      // Failed escaping as JSON
-      // Escape raw text
-      try { // escape only JSON values and keys
-        result = escapingMapper.writeValueAsString(text);
-      } catch ( Exception e ) {
-        //TODO log debug
-        e.printStackTrace();
-      }
-    }
-    return result;
-  }
-
-  public String escapeJsonValuesImpl( String text ) {
-    return escapeJsonValues3( text );
-  }
-  
-  public static String escapeJsonValues( String text ) {
-    return (new EscapeUtils()).escapeJsonValuesImpl( text );
   }
 
 }
