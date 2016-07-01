@@ -13,7 +13,7 @@
  * See the GNU General Public License for more details.
  *
  *
- * Copyright 2006 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2006 - 2016 Pentaho Corporation.  All rights reserved.
  */
 
 package org.pentaho.platform.web.http.api.resources.utils;
@@ -21,12 +21,14 @@ package org.pentaho.platform.web.http.api.resources.utils;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.SerializableString;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.io.CharacterEscapes;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializerProvider;
@@ -88,6 +90,7 @@ public class EscapeUtils {
           esc['>'] = CharacterEscapes.ESCAPE_STANDARD;
           esc['&'] = CharacterEscapes.ESCAPE_STANDARD;
           esc['\''] = CharacterEscapes.ESCAPE_STANDARD;
+          esc['\"'] = CharacterEscapes.ESCAPE_STANDARD;
           asciiEscapes = esc;
       }
       // this method gets called for character codes 0 - 127
@@ -113,6 +116,23 @@ public class EscapeUtils {
     return result;
   }
 
+  public static String escapeRaw( String text ) {
+    if (text == null) {
+      return null;
+    }
+    ObjectMapper escapingMapper = new ObjectMapper();
+    escapingMapper.getJsonFactory().setCharacterEscapes(new HTMLCharacterEscapes());
+
+    String result = null;
+    try {
+      result = escapingMapper.writeValueAsString( text );
+    } catch ( Exception e ) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return result.substring( 1, result.length()-1 );
+  }
+
   public static String escapeHtml( String text ) {
     if (text == null) {
       return null;
@@ -129,6 +149,18 @@ public class EscapeUtils {
     } catch ( Exception e ) {
       //TODO log debug
       return escapeHtml(text);
+    }
+  }
+
+  public static String escapeJsonOrRaw( String text ) {
+    if (text == null) {
+      return null;
+    }
+    try {
+      return escapeJson( text );
+    } catch ( Exception e ) {
+      //TODO log debug
+      return escapeRaw(text);
     }
   }
 
