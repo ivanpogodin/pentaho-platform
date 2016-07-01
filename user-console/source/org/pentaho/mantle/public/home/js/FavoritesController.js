@@ -64,8 +64,7 @@ define(["home/favorites", "dojox/html/entities"], function (Favorites, Entities)
             async: false,
             success: function (result) {
               try {
-                //that.favoritesList = JSON.parse(Entities.decode(result));
-                that.favoritesList = JSON.parse(result);
+                that.favoritesList = JSON.parse(Entities.decode(result));
               } catch (err) {
                 that.favoritesList = [];
               }

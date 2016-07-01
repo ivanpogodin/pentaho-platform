@@ -49,6 +49,7 @@ public class UserSettingsResourceTest {
     PentahoSystem.registerObject( userSettingService );
     Response response = userSettingsResource.setUserSetting( "favorites", "[{\"fullPath\":\"/public/Steel Wheels/Top Customers (report).prpt\", \"title\":\"<script>if(true&&'str'!='str2')alert(1)</script>\", \"lastUse\":0}]" );
 
-    verify( userSettingService ).setUserSetting( "favorites", "[{&quot;fullPath&quot;:&quot;/public/Steel Wheels/Top Customers (report).prpt&quot;, &quot;title&quot;:&quot;&lt;script&gt;if(true&amp;&amp;'str'!='str2')alert(1)&lt;/script&gt;&quot;, &quot;lastUse&quot;:0}]" );
+    verify( userSettingService ).setUserSetting( "favorites",
+          "[{\"fullPath\":\"/public/Steel Wheels/Top Customers (report).prpt\",\"lastUse\":0,\"title\":\"&lt;script&gt;if(true&amp;&amp;'str'!='str2')alert(1)&lt;/script&gt;\"}]");
   }
 }
