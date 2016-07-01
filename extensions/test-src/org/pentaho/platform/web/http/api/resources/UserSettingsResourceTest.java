@@ -20,7 +20,6 @@ package org.pentaho.platform.web.http.api.resources;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.pentaho.platform.web.http.api.resources.UserSettingsResource;
 import org.pentaho.platform.api.usersettings.IUserSettingService;
 import org.pentaho.platform.engine.core.system.PentahoSystem;
 
