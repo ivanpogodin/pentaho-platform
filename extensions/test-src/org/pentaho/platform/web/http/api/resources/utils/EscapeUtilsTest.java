@@ -23,17 +23,6 @@ import org.junit.Test;
 
 public class EscapeUtilsTest {
 
-  public EscapeUtilsTest() {
-    // TODO Auto-generated constructor stub
-  }
-
-  public static void main( String[] args ) {
-    System.out.println( ( new Throwable() ).getStackTrace()[0].getMethodName() );
-    EscapeUtils eu = new EscapeUtils();
-    Assert.assertEquals( "[1]", EscapeUtils.escapeJsonOrRaw( "[1]" ) );
-    Assert.assertEquals( "[\"asdf\",\"&lt;xxx&gt;\"]", eu.escapeJsonOrRaw( "[\"asdf\",\"<xxx>\"]" ) );
-  }
-
   @Test
   public void test0() {
     System.out.println();
