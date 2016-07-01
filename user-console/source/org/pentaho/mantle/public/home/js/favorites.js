@@ -196,7 +196,8 @@ define(["common-ui/util/PentahoSpinner", "common-ui/util/spin.min", "dojox/html/
       var template = Handlebars.compile(this.template.html);
       if (items.length > 0) {
         try {
-          context[this.name] = JSON.parse(Entities.decode(items));
+          context[this.name] = JSON.parse(items);
+          //context[this.name] = JSON.parse(Entities.decode(items));
           context.isEmpty = context[this.name].length == 0;
           this.currentItems = context[this.name];
           if (context.isEmpty) {
