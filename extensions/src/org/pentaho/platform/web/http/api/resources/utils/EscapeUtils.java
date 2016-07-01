@@ -21,14 +21,12 @@ package org.pentaho.platform.web.http.api.resources.utils;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.SerializableString;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.io.CharacterEscapes;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializerProvider;
@@ -130,26 +128,7 @@ public class EscapeUtils {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    return result.substring( 1, result.length()-1 );
-  }
-
-  public static String escapeHtml( String text ) {
-    if (text == null) {
-      return null;
-    }
-    return StringEscapeUtils.escapeHtml4(text);
-  }
-
-  public static String escapeJsonOrHtml( String text ) {
-    if (text == null) {
-      return null;
-    }
-    try {
-      return escapeJson( text );
-    } catch ( Exception e ) {
-      //TODO log debug
-      return escapeHtml(text);
-    }
+    return result.substring( 1, result.length()-1 );//unquote
   }
 
   public static String escapeJsonOrRaw( String text ) {
