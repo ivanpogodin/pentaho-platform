@@ -34,7 +34,7 @@ import org.codehaus.jackson.map.module.SimpleModule;
 import org.eclipse.jetty.util.ajax.JSON;
 
 public class EscapeUtils {
-  
+
   private static class HtmlEscapeStringSerializer extends JsonSerializer<String> {
 
     @Override
@@ -64,7 +64,7 @@ public class EscapeUtils {
       return result;
     }
   }
-  
+
   private static final int[] esc;
   static{
       esc  = CharacterEscapes.standardAsciiEscapesForJSON();
@@ -74,7 +74,7 @@ public class EscapeUtils {
       esc[(int)'\''] = CharacterEscapes.ESCAPE_CUSTOM;
       esc[(int)'\"'] = CharacterEscapes.ESCAPE_CUSTOM;
   }
-  
+
   private static class HTMLCharacterEscapes extends CharacterEscapes
   {
       private final int[] asciiEscapes;
@@ -102,6 +102,12 @@ public class EscapeUtils {
       }
   }
 
+  /**
+   * Escapes Strings in a JSON structure
+   * @param text
+   * @return
+   * @throws IOException if failed (when text is not not JSON)
+   */
   public static String escapeJson( String text ) throws IOException {
     if (text == null) {
       return null;
@@ -114,6 +120,11 @@ public class EscapeUtils {
     return result;
   }
 
+  /**
+   * Escapes any text using the same rules as <code>escapeJson() does</code>
+   * @param text
+   * @return
+   */
   public static String escapeRaw( String text ) {
     if (text == null) {
       return null;
@@ -125,7 +136,6 @@ public class EscapeUtils {
     try {
       result = escapingMapper.writeValueAsString( text );
     } catch ( Exception e ) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return result.substring( 1, result.length()-1 );//unquote
@@ -138,7 +148,7 @@ public class EscapeUtils {
     try {
       return escapeJson( text );
     } catch ( Exception e ) {
-      //TODO log debug
+      //logger.debug ?
       return escapeRaw(text);
     }
   }
