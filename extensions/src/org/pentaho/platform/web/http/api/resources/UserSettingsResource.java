@@ -18,6 +18,7 @@
 package org.pentaho.platform.web.http.api.resources;
 
 import org.codehaus.enunciate.Facet;
+import org.codehaus.jackson.io.CharacterEscapes;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -34,6 +35,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+
 import java.util.ArrayList;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -124,13 +126,20 @@ public class UserSettingsResource extends AbstractJaxRSResource {
     }
     Object jsonObj;
     try {
+      
+      
       jsonObj = (new JSONParser()).parse( jsonSrc );
+      
+      ObjectMapper om = new ObjectMapper
     } catch ( ParseException e ) {
       //TODO: log-debug
+      e.printStackTrace();
       return encodeString(jsonSrc);
     }
     Object encodedJsonObj = encodeJsonStringValues( jsonObj );
-    return String.valueOf( encodedJsonObj );
+    final String result = String.valueOf( encodedJsonObj );
+    System.out.println("result=" + result);
+    return result;
   }
   
   <T> T encodeJsonStringValues(T jsonObj) {
@@ -178,4 +187,28 @@ public class UserSettingsResource extends AbstractJaxRSResource {
   }
   
 
-}
+  class HTMLCharacterEscapes extends CharacterEscapes
+  {
+      private final int[] asciiEscapes;
+      
+      public HTMLCharacterEscapes()
+      {
+          // start with set of characters known to require escaping (double-quote, backslash etc)
+          int[] esc = CharacterEscapes.standardAsciiEscapesForJSON();
+          // and force escaping of a few others:
+          esc['<'] = CharacterEscapes.ESCAPE_STANDARD;
+          esc['>'] = CharacterEscapes.ESCAPE_STANDARD;
+          esc['&'] = CharacterEscapes.ESCAPE_STANDARD;
+          esc['\''] = CharacterEscapes.ESCAPE_STANDARD;
+          asciiEscapes = esc;
+      }
+      // this method gets called for character codes 0 - 127
+      @Override public int[] getEscapeCodesForAscii() {
+          return asciiEscapes;
+      }
+      // and this for others; we don't need anything special here
+      @Override public SerializableString getEscapeSequence(int ch) {
+          // no further escaping (beyond ASCII chars) needed:
+          return null;
+      }
+  }}
