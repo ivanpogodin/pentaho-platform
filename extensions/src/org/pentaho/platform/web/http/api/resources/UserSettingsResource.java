@@ -23,6 +23,7 @@ import org.pentaho.platform.api.usersettings.IUserSettingService;
 import org.pentaho.platform.api.usersettings.pojo.IUserSetting;
 import org.pentaho.platform.engine.core.system.PentahoSessionHolder;
 import org.pentaho.platform.engine.core.system.PentahoSystem;
+import org.pentaho.platform.web.http.api.resources.services.IEscapeUtilsService;
 import org.pentaho.platform.web.http.api.resources.utils.EscapeUtils;
 
 import javax.ws.rs.GET;
@@ -108,10 +109,10 @@ public class UserSettingsResource extends AbstractJaxRSResource {
   @Facet ( name = "Unsupported" )
   public Response setUserSetting( @PathParam( "setting" ) String setting, String settingValue ) {
     IUserSettingService settingsService = PentahoSystem.get( IUserSettingService.class, getPentahoSession() );
+    IEscapeUtilsService escapeUtilsService = PentahoSystem.get( IEscapeUtilsService.class, getPentahoSession() );
 
     //preventing stored XSS(PPP-3464)
-
-    settingValue = EscapeUtils.escapeJsonOrRaw( settingValue );
+    settingValue = escapeUtilsService.escapeJsonOrRaw( settingValue );
     settingsService.setUserSetting( setting, settingValue );
     return Response.ok( settingValue ).build();
   }

@@ -326,4 +326,8 @@ not directly from the PentahoObjectFactory. -->
     <pen:publish as-type="INTERFACES"/>
   </bean>
 
-</beans>
+  <bean id="IEscapeUtilsService" class="org.pentaho.platform.web.http.api.resources.services.EscapeUtilsService">
+    <pen:publish as-type="INTERFACES"/>
+  </bean>
+
+  </beans>
