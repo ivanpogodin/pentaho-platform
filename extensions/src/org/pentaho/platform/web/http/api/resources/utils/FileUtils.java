@@ -13,7 +13,7 @@
  * See the GNU General Public License for more details.
  *
  *
- * Copyright 2006 - 2015 Pentaho Corporation.  All rights reserved.
+ * Copyright 2006 - 2016 Pentaho Corporation.  All rights reserved.
  */
 
 package org.pentaho.platform.web.http.api.resources.utils;
@@ -22,6 +22,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pentaho.platform.api.repository2.unified.RepositoryFile;
 import org.pentaho.platform.util.RepositoryPathEncoder;
 import org.pentaho.platform.web.http.messages.Messages;
 
@@ -68,5 +69,32 @@ public class FileUtils {
     }
 
     return stringToConvert.split( "[,]" );
+  }
+
+  public static String getParentPath( final String path ) {
+    if ( path == null ) {
+      throw new IllegalArgumentException();
+    } else if ( RepositoryFile.SEPARATOR.equals( path ) ) {
+      return null;
+    }
+    int lastSlashIndex = path.lastIndexOf( RepositoryFile.SEPARATOR );
+    if ( lastSlashIndex == 0 ) {
+      return RepositoryFile.SEPARATOR;
+    } else if ( lastSlashIndex > 0 ) {
+      return path.substring( 0, lastSlashIndex );
+    } else {
+      throw new IllegalArgumentException();
+    }
+  }
+
+  public static boolean isRootPath( final String path ) {
+    if ( path == null ) {
+      throw new IllegalArgumentException();
+    }
+    return RepositoryFile.SEPARATOR.equals( path );
+  }
+
+  public static boolean isRootLevelPath( final String path ) {
+    return !isRootPath( path ) && isRootPath( getParentPath( path ) );
   }
 }
